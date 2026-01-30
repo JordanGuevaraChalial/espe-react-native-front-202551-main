@@ -1,35 +1,39 @@
-import { StyleSheet } from 'react-native';
-import { HomeScreen } from './src/screens/home/home';
-import { AutorScreen } from './src/screens/autor/autor';
-import { LibroScreen } from './src/screens/libro/libro';
-import { AutorFormScreen } from './src/screens/autor/autor-form';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-import { LoginScreen } from './src/screens/login/login';
-import { RegisterScreen } from './src/screens/register/register';
+import { useEffect, useState, createContext, useMemo } from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import { AuthStack } from "./src/navigation/AuthStack";
+import { AppStack } from "./src/navigation/app.Navigation";
+import { getToken, saveToken, removeToken } from "./src/services/auth";
 
-const Stack = createStackNavigator();
+const AuthContext = createContext(null);
 
 export default function App() {
+  const [token, setToken] = useState(null);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    (async () => {
+      const t =  await getToken();
+      setToken(t);
+      setLoading(false);
+    })();
+  }, []);
+  const auth=useMemo(() => ({
+    token,
+    signIn: async (nuevoToken) => {
+      await saveToken(nuevoToken);
+      setToken(nuevoToken);
+    },
+    signOut: async () => {
+      await removeToken();
+      setToken(null);
+    },
+  }), [token]);
   return (
-    <NavigationContainer initialRouteName="Login">
-        <Stack.Navigator>
-            <Stack.Screen name='Register' component={RegisterScreen} options={{title:"Register"}}/>
-            <Stack.Screen name='Login' component={LoginScreen} options={{title:"Login"}}/>
-            <Stack.Screen name='Home' component={HomeScreen} options={{title:"Inicio"}}/>
-            <Stack.Screen name='Autor' component={AutorScreen} />
-            <Stack.Screen name='Libro' component={LibroScreen}/>
-            <Stack.Screen name='AutorForm' component={AutorFormScreen} options={{title:"Crear Autor"}}/>
-        </Stack.Navigator>
-    </NavigationContainer>
+    <AuthContext.Provider value={auth}>
+      <NavigationContainer>
+        {loading ? null : token ? <AppStack /> : <AuthStack />}
+      </NavigationContainer>
+    </AuthContext.Provider>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+

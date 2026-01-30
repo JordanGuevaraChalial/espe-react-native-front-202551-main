@@ -37,5 +37,14 @@ export const styles = StyleSheet.create({
     },
     iconContainer: {
         padding: 5,
-    }
+    },
+    footerText: {
+    textAlign: 'center',
+    color: '#666',
+    marginBottom: 20,
+  },
+  linkText: {
+    color: '#007BFF',
+    fontWeight: 'bold',
+  }
 });

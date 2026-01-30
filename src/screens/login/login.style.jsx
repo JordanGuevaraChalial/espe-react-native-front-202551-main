@@ -36,6 +36,5 @@ export const styles = StyleSheet.create({
   linkText: {
     color: '#007BFF',
     fontWeight: 'bold',
-    textDecorationLine: 'underline',
   }
 });
