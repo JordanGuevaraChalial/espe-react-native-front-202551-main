@@ -1,34 +1,22 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { EDPOINTS } from "../config/api";
+import { getToken, removeToken } from "./auth";
 
-export const apiRequest = async (endpoint, method, body = null) => {
-  try {
-    const token = await getToken();
-    
-    const headers = {
-      "Content-Type": "application/json",
-    };
+export async function apiFetch(url, options = {}) {
+  const token = await getToken();
+  console.log("Token encontrado para la petición:", token || "NO HAY TOKEN");
 
-    if (token) {
-      headers["Authorization"] = `Bearer ${token}`;
-    }
+  const headers = {
+    "Content-Type": "application/json",
+    ...(options.headers || {}),
+    ...(token ? { authorization: `Bearer ${token}` } : {}),
+  };
 
-    const config = {
-      method: method,
-      headers: headers,
-    };
+  const res = await fetch(url, { ...options, headers });
 
-    if (body) {
-      config.body = JSON.stringify(body);
-    }
+  if (res.status === 401) {
+    await  removeToken();
 
-    const response = await fetch(endpoint, config);
-    
-    if (response.status === 401) {
-       console.error("Sesión expirada");
-    }
-    return await response.json();
-  } catch (error) {
-    console.error("Error en la petición API:", error);
+    throw new Error("Sesión expirada. Inicia sesión nuevamente.");
   }
-};
+
+  return res;
+}

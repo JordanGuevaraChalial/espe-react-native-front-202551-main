@@ -1,6 +1,6 @@
-const BASE_URL = "http://10.41.1.193:3000";
+const BASE_URL = "http://192.168.0.241:3000";
 
-export const EDPOINTS = {
+export const ENDPOINTS = {
     AUTOR: `${BASE_URL}/autor`,
     GENERO: `${BASE_URL}/genero`,
     AUTH: `${BASE_URL}/auth`

@@ -1,39 +1,55 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { EDPOINTS } from "../config/api";
-const key ="auth_token";
+import { ENDPOINTS } from "../config/api";
+
+const KEY = "auth_token";
+
+export const saveToken = async (token) => {
+  await AsyncStorage.setItem(KEY, token);
+};
 
 export const getToken = async () => {
-    return await AsyncStorage.getItem(key);
-}
-export const saveToken = async (token) => {
-    await AsyncStorage.setItem(key, token);
-}
+  return await AsyncStorage.getItem(KEY);
+};
+
 export const removeToken = async () => {
-    await AsyncStorage.removeItem(key);
-}
+  await AsyncStorage.removeItem(KEY);
+};
 
-const loginRequest = async ({username, password}) =>{
-    try {
-        const response = await fetch(`${EDPOINTS.AUTH}/login`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({username:username, password:password})
+export const loginRequest = async ({ username, password }) => {
+  const response = await fetch(`${ENDPOINTS.AUTH}/login`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      username,
+      password,
+    }),
+  });
 
-    });
-    if(!response.ok){
-        throw new Error("Error en la autenticacion");
-    }
-    const json = await response.json();
-    const token = json.token;
-    saveToken(token);
-    return token;
-    } catch (error) {
-        console.error(error);
-    }
-    
-    
-} 
+  let data = null;
+  try {
+    data = await response.json();
+  } catch {
+    data = null;
+  }
 
 
+  if (!response.ok) {
+    const message = data?.message || "Credenciales inválidas";
+    throw new Error(message);
+  }
+
+  const token =
+    typeof data?.token === "string"
+      ? data.token
+      : typeof data?.accessToken === "string"
+      ? data.accessToken
+      : null;
+
+  if (!token) {
+    throw new Error("La API no devolvió un token válido (string)");
+  }
+
+  return token;
+};

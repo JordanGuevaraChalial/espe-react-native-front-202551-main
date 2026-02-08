@@ -3,16 +3,16 @@ import { FlatList, Button, Alert } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { Container } from "../../components/container/container";
 import { Card } from "../../components/card/card";
-import { EDPOINTS } from "../../config/api";
-import {apiFetch} from "../../services/api";
+import { ENDPOINTS } from "../../config/api";
+import { apiFetch } from "../../services/api";
+
 export const AutorScreen = ({ navigation }) => {
   const [autores, setAutores] = useState([]);
 
   const getAutores = async () => {
     try {
-      const response = await apiFetch(EDPOINTS.AUTOR,{
-        method: "GET",
-        body:{}
+      const response = await apiFetch(ENDPOINTS.AUTOR,{
+        method:"GET",
       });
       const json = await response.json();
       setAutores(json);
@@ -32,7 +32,7 @@ export const AutorScreen = ({ navigation }) => {
 
   const eliminarAutor = async (id) => {
     try {
-      const response = await fetch(`${EDPOINTS.AUTOR}/${id}`, {method:"DELETE"});
+      const response = await fetch(`${ENDPOINTS.AUTOR}/${id}`, {method:"DELETE"});
 
       if (!response.ok) {
         throw new Error("Error al eliminar");

@@ -1,54 +1,96 @@
-import { View, TextInput,Text,Button,TouchableOpacity } from "react-native";
-import {Container} from "../../components/container/container"
-import { styles } from "./login.style";
-import { useState } from "react";
-import {AuthContext} from "../../../App"
-import {loginRequest} from "../../services/auth"
-export const LoginScreen = ({navigation}) => {
-    const {signIn} = useContext(AuthContext);
+import { useState, useContext } from "react";
+import { TextInput, View, Text, TouchableOpacity,Alert } from "react-native";
+import { Container } from "../../components/container/container";
+import { styles } from "./login.styles";
+import { AuthContext } from "../../context/AuthContext";
+import { loginRequest } from "../../services/auth";
+
+export const LoginScreen = ({ navigation }) => {
+    const { signIn } = useContext(AuthContext);
+
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
-
     const [loading, setLoading] = useState(false);
+
     const onLogin = async () => {
+        if (!username || !password) return;
+
         setLoading(true);
         try {
-            const token = await loginRequest(username, password);
+            const token = await loginRequest({ username, password });
             await signIn(token);
+            Alert.alert(
+        "¡Bienvenido!",
+        "Sesión iniciada correctamente",
+        [
+          {
+            text: "Continuar",
+            onPress: () => {
+              navigation.navigate("Home");
+            }
+          }
+        ]
+      );
         } catch (error) {
-            console.error("Login failed", error);
+            console.log("No se pudo loguear:", error?.message || error);
+            Alert.alert("Error", error?.message || "El usuario o contraseña son incorrectos");
         } finally {
             setLoading(false);
         }
     };
-    
+
     return (
         <Container style={styles.container}>
-            <Text style={styles.title}>Iniciar Sesión</Text>
-            
-            <TextInput 
-                style={styles.input} 
-                value={username}
-                placeholder="Nombre de Usuario" 
-                onChangeText={setUsername}
-            />
-            
-            <TextInput 
-                style={styles.input} 
-                value={password}
-                placeholder="Contraseña" 
-                secureTextEntry 
-                onChangeText={setPassword}
-            />
-            
-            <Text style={styles.footerText}>
-                Si no tiene una cuenta, 
-                <TouchableOpacity onPress={() => navigation.navigate("Register")}>
-                    <Text style={styles.linkText}> Registrese</Text>
-                </TouchableOpacity>
-            </Text>
-            
-            <Button title="Ingresar" color="#007BFF" />
+            <View style={styles.content}>
+                <View style={styles.header}>
+                    <Text style={styles.title}>Bienvenido</Text>
+                    <Text style={styles.subtitle}>Inicia sesión para continuar</Text>
+                </View>
+
+                <View style={styles.form}>
+                    <View style={styles.inputContainer}>
+                        <Text style={styles.label}>Usuario</Text>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Nombre de Usuario"
+                            placeholderTextColor="#999"
+                            value={username}
+                            onChangeText={setUsername}
+                            autoCapitalize="none"
+                        />
+                    </View>
+
+                    <View style={styles.inputContainer}>
+                        <Text style={styles.label}>Contraseña</Text>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Contraseña"
+                            placeholderTextColor="#999"
+                            value={password}
+                            onChangeText={setPassword}
+                            secureTextEntry
+                            autoCapitalize="none"
+                        />
+                    </View>
+
+                    <TouchableOpacity
+                        style={styles.loginButton}
+                        onPress={onLogin}
+                        disabled={loading}
+                    >
+                        <Text style={styles.loginButtonText}>
+                            {loading ? "Ingresando..." : "Ingresar"}
+                        </Text>
+                    </TouchableOpacity>
+
+                    <View style={styles.registerContainer}>
+                        <Text style={styles.registerText}>¿No tienes una cuenta? </Text>
+                        <TouchableOpacity onPress={() => navigation.navigate("Register")}>
+                            <Text style={styles.registerLink}>Regístrate</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </View>
         </Container>
-    )
-}
+    );
+};

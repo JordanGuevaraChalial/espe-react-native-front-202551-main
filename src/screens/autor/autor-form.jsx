@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { View, TextInput, Button, Alert } from "react-native";
 import { Container } from "../../components/container/container";
-import { EDPOINTS } from "../../config/api";
+import { ENDPOINTS } from "../../config/api";
 
 export const AutorFormScreen = ({ navigation }) => {
   const [nombre, setNombre] = useState("");
@@ -12,9 +12,9 @@ export const AutorFormScreen = ({ navigation }) => {
   const guardarAutor = async (metodo) => {
     try {
       if (metodo == "POST") {
-        setUrl(EDPOINTS.AUTOR);
+        setUrl(ENDPOINTS.AUTOR);
       }else{
-        setUrl(EDPOINTS.AUTOR+`/${id}`);
+        setUrl(ENDPOINTS.AUTOR+`/${id}`);
       }
 
       const response = await fetch(url, {
