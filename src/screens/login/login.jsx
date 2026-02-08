@@ -1,5 +1,5 @@
 import { useState, useContext } from "react";
-import { TextInput, View, Text, TouchableOpacity,Alert } from "react-native";
+import { TextInput, View, Text, TouchableOpacity, Alert } from "react-native";
 import { Container } from "../../components/container/container";
 import { styles } from "./login.styles";
 import { AuthContext } from "../../context/AuthContext";
@@ -20,17 +20,17 @@ export const LoginScreen = ({ navigation }) => {
             const token = await loginRequest({ username, password });
             await signIn(token);
             Alert.alert(
-        "¡Bienvenido!",
-        "Sesión iniciada correctamente",
-        [
-          {
-            text: "Continuar",
-            onPress: () => {
-              navigation.navigate("Home");
-            }
-          }
-        ]
-      );
+                "¡Bienvenido!",
+                "Sesión iniciada correctamente",
+                [
+                    {
+                        text: "Continuar",
+                        onPress: () => {
+                            navigation.navigate("Home");
+                        }
+                    }
+                ]
+            );
         } catch (error) {
             console.log("No se pudo loguear:", error?.message || error);
             Alert.alert("Error", error?.message || "El usuario o contraseña son incorrectos");
